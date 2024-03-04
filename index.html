@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,13 +7,34 @@
 <script>
 function calculateScore() {
   // 사용자 입력 받기
-  var originalScore = document.getElementById("originalScore").value; // 원래 점수
-  var originalPercentage = document.getElementById("originalPercentage").value / 100; // 원래 배율 (퍼센트를 실수로 변환)
-  var targetScale = document.getElementById("targetScale").value / 100; // 변환할 배율 (퍼센트를 실수로 변환)
+  var originalScore = document.getElementById("originalScore").value;
+  var originalPercentage = document.getElementById("originalPercentage").value / 100;
+  var targetScale = document.getElementById("targetScale").value / 100;
+  var originalBoosts = parseInt(document.getElementById("originalBoosts").value);
+  var targetBoosts = parseInt(document.getElementById("targetBoosts").value);
 
-  // 실제 점수 계산
-  var baseScore = originalScore / originalPercentage; // 원점수를 원래 배율로 나누어 기본 점수를 찾음
-  var newScore = baseScore * targetScale; // 기본 점수에 새 배율을 적용
+  // 부스트에 따른 배율 계산 함수
+  function boostMultiplier(boosts) {
+    switch (boosts) {
+      case 1: return 5;
+      case 2: return 10;
+      case 3: return 15;
+      case 4: return 19;
+      case 5: return 23;
+      case 6: return 26;
+      case 7: return 29;
+      case 8: return 31;
+      case 9: return 33;
+      case 10: return 35;
+      default: return 1; // 부스트가 없는 경우
+    }
+  }
+
+  // 원래 점수에 대한 기본 점수 계산
+  var baseScore = originalScore / (originalPercentage * boostMultiplier(originalBoosts));
+
+  // 변환된 배율과 부스트를 적용한 새 점수 계산
+  var newScore = baseScore * targetScale * boostMultiplier(targetBoosts);
 
   // 결과 출력
   document.getElementById("result").innerHTML = "변환된 점수: " + newScore.toFixed(2);
@@ -26,13 +46,19 @@ function calculateScore() {
 <h2>이벤포 배수 변환 계산기</h2>
 
 <label for="originalScore">비교군 이벤트 포인트 점수:</label>
-<input type="number" id="originalScore" name="originalScore"><br><br>
+<input type="number" id="originalScore" name="originalScore" style="width: 100px;"><br><br>
 
 <label for="originalPercentage">비교군 이벤트 배율 %:</label>
-<input type="number" id="originalPercentage" name="originalPercentage" step="0.01"><br><br>
+<input type="number" id="originalPercentage" name="originalPercentage" step="0.01" style="width: 100px;"><br><br>
 
-<label for="targetScale">변환할 이벤트 배율 %:</label>
-<input type="number" id="targetScale" name="targetScale" step="0.01"><br><br>
+<label for="originalBoosts">비교군 부스트 개수:</label>
+<input type="number" id="originalBoosts" name="originalBoosts" style="width: 100px;"><br><br>
+
+<label for="targetScale">자신의 이벤트 배율 %:</label>
+<input type="number" id="targetScale" name="targetScale" step="0.01" style="width: 100px;"><br><br>
+
+<label for="targetBoosts">자신의 부스트 개수:</label>
+<input type="number" id="targetBoosts" name="targetBoosts" style="width: 100px;"><br><br>
 
 <button onclick="calculateScore()">포인트 계산</button>
 
