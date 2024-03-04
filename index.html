@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>점수 및 배율 변환 계산기</title>
+<title>이벤포 점수 변환 계산기</title>
 <script>
 function calculateScore() {
   // 사용자 입력 받기
@@ -43,22 +43,22 @@ function calculateScore() {
 </head>
 <body>
 
-<h2>이벤포 배수 변환 계산기</h2>
+<h2>이벤포 점수 변환 계산기</h2>
 
 <label for="originalScore">비교군 이벤트 포인트 점수:</label>
-<input type="number" id="originalScore" name="originalScore" style="width: 100px;"><br><br>
+<input type="number" id="originalScore" name="originalScore" style="width: 100px; text-align: center;"><br><br>
 
 <label for="originalPercentage">비교군 이벤트 배율 %:</label>
-<input type="number" id="originalPercentage" name="originalPercentage" step="0.01" style="width: 100px;"><br><br>
+<input type="number" id="originalPercentage" name="originalPercentage" step="0.01" style="width: 100px; text-align: center;"><br><br>
 
 <label for="originalBoosts">비교군 부스트 개수:</label>
-<input type="number" id="originalBoosts" name="originalBoosts" style="width: 100px;"><br><br>
+<input type="number" id="originalBoosts" name="originalBoosts" style="width: 100px; text-align: center;"><br><br>
 
 <label for="targetScale">자신의 이벤트 배율 %:</label>
-<input type="number" id="targetScale" name="targetScale" step="0.01" style="width: 100px;"><br><br>
+<input type="number" id="targetScale" name="targetScale" step="0.01" style="width: 100px; text-align: center;"><br><br>
 
 <label for="targetBoosts">자신의 부스트 개수:</label>
-<input type="number" id="targetBoosts" name="targetBoosts" style="width: 100px;"><br><br>
+<input type="number" id="targetBoosts" name="targetBoosts" style="width: 100px; text-align: center;"><br><br>
 
 <button onclick="calculateScore()">포인트 계산</button>
 
