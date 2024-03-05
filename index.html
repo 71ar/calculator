@@ -3,15 +3,116 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>이벤포 점수 변환 계산기</title>
+<title>점수 및 배율 변환 계산기</title>
+<style>
+  .form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  label {
+    margin-right: 10px;
+    font-size: 18px;
+  }
+  input[type="number"] {
+    flex-grow: 1;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 18px;
+  }
+  .error-input {
+    border: 2px solid red;
+  }
+  .error-message {
+    margin-top: 10px; 
+  }
+  button {
+    font-size: 16px;
+    padding: 12px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+  button:hover {
+    background-color: #45a049;
+  }
+  
+  #result, #playsNeeded {
+    font-size: 16px;
+  }
+</style>
+</head>
+<body>
+  
+<h2>이벤포 점수 변환 계산기</h2>
+
+<label for="originalScore">비교군 이벤포 판당 점수:</label>
+<input type="number" id="originalScore" name="originalScore" style="width: 100px; text-align: center;"><br><br>
+  
+<label for="originalDeckPower">비교군 덱 종합력:</label>
+<input type="number" id="originalDeckPower" name="originalDeckPower" style="width: 100px; text-align: center;"><br><br>
+  
+<label for="userDeckPower">자신의 덱 종합력:</label>
+<input type="number" id="userDeckPower" name="userDeckPower" style="width: 100px; text-align: center;"><br><br>  
+
+<label for="originalPercentage">비교군 이벤트 배율 %:</label>
+<input type="number" id="originalPercentage" name="originalPercentage" step="0.01" style="width: 100px; text-align: center;"><br><br>
+  
+<label for="targetScale">자신의 이벤트 배율 %:</label>
+<input type="number" id="targetScale" name="targetScale" step="0.01" style="width: 100px; text-align: center;"><br><br>  
+
+<label for="originalBoosts">비교군 부스트/불 개수:</label>
+<input type="number" id="originalBoosts" name="originalBoosts" style="width: 100px; text-align: center;"><br><br>
+
+<label for="targetBoosts">자신의 부스트/불 개수:</label>
+<input type="number" id="targetBoosts" name="targetBoosts" style="width: 100px; text-align: center;"><br><br>
+
+<label for="targetScore">목표 점수:</label>
+<input type="number" id="targetScore" name="targetScore" style="width: 150px; text-align: center;"><br><br>
+
+<button onclick="calculateScore()">포인트 계산</button>
+
+<p id="result"></p>
+<p id="playsNeeded"></p>
+
 <script>
 function calculateScore() {
-  var originalScore = document.getElementById("originalScore").value;
-  var originalPercentage = document.getElementById("originalPercentage").value / 100;
-  var targetScale = document.getElementById("targetScale").value / 100;
-  var originalBoosts = parseInt(document.getElementById("originalBoosts").value);
-  var targetBoosts = parseInt(document.getElementById("targetBoosts").value);
-  var targetScore = parseInt(document.getElementById("targetScore").value);
+  document.querySelectorAll('input[type="number"]').forEach(input => {
+    input.classList.remove('error-input');
+  });
+
+  var originalScore = parseInt(document.getElementById("originalScore").value, 10);
+  var originalPercentage = parseFloat(document.getElementById("originalPercentage").value) / 100;
+  var targetScale = parseFloat(document.getElementById("targetScale").value) / 100;
+  var originalBoosts = parseInt(document.getElementById("originalBoosts").value, 10);
+  var targetBoosts = parseInt(document.getElementById("targetBoosts").value, 10);
+  var targetScore = document.getElementById("targetScore").value ? parseInt(document.getElementById("targetScore").value, 10) : null;
+  var originalDeckPower = document.getElementById("originalDeckPower").value;
+  var userDeckPower = document.getElementById("userDeckPower").value;
+
+  var errorMessages = [];
+  
+  if (!originalScore) errorMessages.push("이벤포 판당 점수 항목은 필수 값 입니다.");
+  if (!originalPercentage) errorMessages.push("비교군 이벤트 배율 % 항목은 필수 값 입니다.");
+  if (!targetScale) errorMessages.push("자신의 이벤트 배율 % 항목은 필수 값 입니다.");
+  if (!originalBoosts) errorMessages.push("비교군 부스트/불 개수 항목은 필수 값 입니다.");
+  if (!targetBoosts) errorMessages.push("자신의 부스트/불 개수 항목은 필수 값 입니다.");
+
+  if (errorMessages.length > 0) {
+    document.getElementById("result").innerHTML = "<div class='error-message'>" + errorMessages.join("<br>") + "</div>";
+    return;
+  }
+
+  var scaleAdjustmentFactor = 0;
+  if (originalDeckPower && userDeckPower) {
+    var powerDifference = parseInt(userDeckPower) - parseInt(originalDeckPower);
+    scaleAdjustmentFactor = (powerDifference / 10000) * 0.06;
+  }
+  targetScale += scaleAdjustmentFactor;
 
   function boostMultiplier(boosts) {
     switch (boosts) {
@@ -30,42 +131,19 @@ function calculateScore() {
   }
 
   var baseScore = originalScore / (originalPercentage * boostMultiplier(originalBoosts));
-
   var newScore = Math.floor(baseScore * targetScale * boostMultiplier(targetBoosts));
 
-  var playsNeeded = Math.ceil(targetScore / newScore);
-
-  document.getElementById("result").innerHTML = "변환된 점수: " + newScore;
-  document.getElementById("playsNeeded").innerHTML = "목표 점수에 도달하려면 약 " + playsNeeded + "번 플레이 해야 합니다.";
+  document.getElementById("result").innerHTML = "예상 이벤트 포인트 점수: " + newScore;
+  
+  if (targetScore) {
+    targetScore = parseInt(targetScore, 10);
+    var playsNeeded = Math.ceil(targetScore / newScore);
+    document.getElementById("playsNeeded").innerHTML = "목표 점수에 도달하려면 약 " + playsNeeded + "번 플레이 해야 합니다.";
+  } else {
+    document.getElementById("playsNeeded").innerHTML = "";
+  }
 }
 </script>
+  
 </head>
 <body>
-
-<h2>이벤포 점수 변환 계산기</h2>
-
-<label for="originalScore">비교군 이벤포 판당 점수:</label>
-<input type="number" id="originalScore" name="originalScore" style="width: 100px; text-align: center;"><br><br>
-
-<label for="originalPercentage">비교군 이벤트 배율 %:</label>
-<input type="number" id="originalPercentage" name="originalPercentage" step="0.01" style="width: 100px; text-align: center;"><br><br>
-
-<label for="originalBoosts">비교군 부스트/불 개수:</label>
-<input type="number" id="originalBoosts" name="originalBoosts" style="width: 100px; text-align: center;"><br><br>
-
-<label for="targetScale">내 이벤트 배율 %:</label>
-<input type="number" id="targetScale" name="targetScale" step="0.01" style="width: 100px; text-align: center;"><br><br>
-
-<label for="targetBoosts">내 부스트/불 개수:</label>
-<input type="number" id="targetBoosts" name="targetBoosts" style="width: 100px; text-align: center;"><br><br>
-
-<label for="targetScore">목표 점수:</label>
-<input type="number" id="targetScore" name="targetScore" style="width: 100px; text-align: center;"><br><br>
-
-<button onclick="calculateScore()">포인트 계산</button>
-
-<p id="result"></p>
-<p id="playsNeeded"></p>
-
-</body>
-</html>
